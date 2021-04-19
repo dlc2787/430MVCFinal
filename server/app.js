@@ -14,7 +14,7 @@ const csrf = require('csurf');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
-const dbURL = process.env.MONGODB_URI || 'mongodb://localhost/DomoMaker2';
+const dbURL = process.env.MONGODB_URI || 'mongodb://localhost/MVCService';
 
 // mongoose setup
 const mongooseOptions = {
@@ -64,7 +64,7 @@ app.use(session({
   store: new RedisStore({
     client: redisClient,
   }),
-  secret: 'Domo Arigato',
+  secret: 'fish sticks',
   resave: true,
   saveUninitialized: true,
   cookie: {

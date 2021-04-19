@@ -15,6 +15,67 @@ var handleDomo = function handleDomo(e) {
     loadDomosFromServer();
   });
   return false;
+}; //password update
+
+
+var handleUpdate = function handleUpdate(e) {
+  e.preventDefault();
+  $("#domoMessage").animate({
+    width: 'hide'
+  }, 350);
+
+  if ($("#pass").val() == '' || $("#newPass").val() == '' || $("#newPass2").val() == '') {
+    handleError("All fields are required.");
+    return false;
+  }
+
+  if ($("#newPass").val() !== $("#newPass2").val()) {
+    handleError("Passwords do not match.");
+    return false;
+  }
+
+  sendAjax('POST', $("#updateForm").attr("action"), $("#updateForm").serialize(), redirect);
+  return false;
+};
+
+var UpdateWindow = function UpdateWindow(props) {
+  return /*#__PURE__*/React.createElement("form", {
+    id: "updateForm",
+    name: "updateForm",
+    onSubmit: handleUpdate,
+    action: "/updatePass",
+    method: "POST",
+    className: "mainForm"
+  }, /*#__PURE__*/React.createElement("label", {
+    htmlFor: "oldPass"
+  }, "Password: "), /*#__PURE__*/React.createElement("input", {
+    id: "pass",
+    type: "password",
+    name: "pass",
+    placeholder: "old password"
+  }), /*#__PURE__*/React.createElement("label", {
+    htmlFor: "newPass"
+  }, "New Password: "), /*#__PURE__*/React.createElement("input", {
+    id: "newPass",
+    type: "password",
+    name: "newPass",
+    placeholder: "new password"
+  }), /*#__PURE__*/React.createElement("label", {
+    htmlFor: "newPass2"
+  }, "New Password: "), /*#__PURE__*/React.createElement("input", {
+    id: "newPass2",
+    type: "password",
+    name: "newPass2",
+    placeholder: "retype new password"
+  }), /*#__PURE__*/React.createElement("input", {
+    type: "hidden",
+    name: "_csrf",
+    value: props.csrf
+  }), /*#__PURE__*/React.createElement("input", {
+    className: "formSubmit",
+    type: "submit",
+    value: "Sign up"
+  }));
 };
 
 var DomoForm = function DomoForm(props) {
@@ -57,6 +118,10 @@ var DomoForm = function DomoForm(props) {
   }));
 };
 
+var EmptySpace = function EmptySpace() {
+  return /*#__PURE__*/React.createElement("div", null);
+};
+
 var DomoList = function DomoList(props) {
   if (props.domos.length === 0) {
     return /*#__PURE__*/React.createElement("div", {
@@ -88,6 +153,13 @@ var DomoList = function DomoList(props) {
   }, domoNodes);
 };
 
+var createUpdateWindow = function createUpdateWindow(csrf) {
+  ReactDOM.render( /*#__PURE__*/React.createElement(UpdateWindow, {
+    csrf: csrf
+  }), document.querySelector("#domos"));
+  ReactDOM.render( /*#__PURE__*/React.createElement(EmptySpace, null), document.querySelector("#makeDomo"));
+};
+
 var loadDomosFromServer = function loadDomosFromServer() {
   sendAjax('GET', '/getDomos', null, function (data) {
     ReactDOM.render( /*#__PURE__*/React.createElement(DomoList, {
@@ -96,7 +168,7 @@ var loadDomosFromServer = function loadDomosFromServer() {
   });
 };
 
-var setup = function setup(csrf) {
+var createDomoWindow = function createDomoWindow(csrf) {
   ReactDOM.render( /*#__PURE__*/React.createElement(DomoForm, {
     csrf: csrf
   }), document.querySelector("#makeDomo"));
@@ -104,6 +176,22 @@ var setup = function setup(csrf) {
     domos: []
   }), document.querySelector("#domos"));
   loadDomosFromServer();
+};
+
+var setup = function setup(csrf) {
+  var updateButton = document.querySelector("#updateButton");
+  var domoButton = document.querySelector("#domoButton");
+  updateButton.addEventListener("click", function (e) {
+    e.preventDefault();
+    createUpdateWindow(csrf);
+    return false;
+  });
+  domoButton.addEventListener("click", function (e) {
+    e.preventDefault();
+    createDomoWindow(csrf);
+    return false;
+  });
+  createDomoWindow(csrf);
 };
 
 var getToken = function getToken() {

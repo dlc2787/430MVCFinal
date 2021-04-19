@@ -35,6 +35,25 @@ const login = (request, response) => {
   });
 };
 
+// method for updating mongoDB with account info
+const updateDB = (res, req, account) => {
+  const savePromise = account.save();
+  savePromise.then(() => {
+    req.session.account = Account.AccountModel.toAPI(account);
+    return res.json({ redirect: '/maker' });
+  });
+  savePromise.catch((err) => {
+    console.log(err);
+
+    if (err.code === 11000) {
+      return res.status(400).json({ error: 'Username already in use.' });
+    }
+
+    return res.status(400).json({ error: 'An error occoured :(' });
+  });
+};
+
+// signup
 const signup = (request, response) => {
   const req = request;
   const res = response;
@@ -60,19 +79,39 @@ const signup = (request, response) => {
     };
 
     const newAccount = new AccountModel(accountData);
-    const savePromise = newAccount.save();
-    savePromise.then(() => {
-      req.session.account = Account.AccountModel.toAPI(newAccount);
-      return res.json({ redirect: '/maker' });
-    });
-    savePromise.catch((err) => {
-      console.log(err);
+    updateDB(req, res, newAccount);
+  });
+};
 
-      if (err.code === 11000) {
-        return res.status(400).json({ error: 'Username already in use.' });
-      }
+// change password
+const updatePass = (request, response) => {
+  const req = request;
+  const res = response;
 
-      return res.status(400).json({ error: 'An error occoured :(' });
+  const { username } = req.session.account;
+  const password = `${req.body.pass}`;
+  const newPass = `${req.body.newPass}`;
+  const newPass2 = `${req.body.newPass2}`;
+
+  if (!username || !password || !newPass || !newPass2) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  if (newPass !== newPass2) {
+    return res.status(400).json({ error: 'New passwords do not match!' });
+  }
+
+  return Account.AccountModel.authenticate(username, password, (err, account) => {
+    if (err || !account) {
+      return res.status(401).json({ error: 'Wrong password!' });
+    }
+    const user = account;
+
+    return Account.AccountModel.generateHash(newPass, (salt, hash) => {
+      user.salt = salt;
+      user.password = hash;
+
+      return updateDB(res, req, user);
     });
   });
 };
@@ -94,4 +133,5 @@ module.exports = {
   logout,
   signup,
   getToken,
+  updatePass,
 };

@@ -15,6 +15,48 @@ const handleDomo = (e) => {
     return false;
 };
 
+//password update
+const handleUpdate = (e) => {
+    e.preventDefault();
+
+    $("#domoMessage").animate({width:'hide'},350);
+
+    if($("#pass").val() == '' || $("#newPass").val() == '' || $("#newPass2").val() == '') {
+        handleError("All fields are required.");
+        return false;
+    }
+
+    if($("#newPass").val() !== $("#newPass2").val()) {
+        handleError("Passwords do not match.");
+        return false;
+    }
+
+    sendAjax('POST', $("#updateForm").attr("action"), $("#updateForm").serialize(), redirect);
+
+    return false;
+}
+
+const UpdateWindow = (props) => {
+    return (
+    <form   id="updateForm"
+            name="updateForm"
+            onSubmit={handleUpdate}
+            action="/updatePass"
+            method="POST"
+            className="mainForm"
+    >
+    <label htmlFor="oldPass">Password: </label>
+    <input id="pass" type ="password" name="pass" placeholder="old password"/>
+    <label htmlFor="newPass">New Password: </label>
+    <input id="newPass" type ="password" name="newPass" placeholder="new password"/>
+    <label htmlFor="newPass2">New Password: </label>
+    <input id="newPass2" type ="password" name="newPass2" placeholder="retype new password"/>
+    <input type="hidden" name="_csrf" value={props.csrf} />
+    <input className="formSubmit" type="submit" value="Sign up" />
+    </form>
+    );
+};
+
 const DomoForm = (props) => {
     return (
         <form id="domoForm"
@@ -35,6 +77,10 @@ const DomoForm = (props) => {
             </form>
     );
 };
+
+const EmptySpace = () => {
+    return (<div></div>);
+}
 
 const DomoList = function(props) {
     if (props.domos.length === 0) {
@@ -63,6 +109,17 @@ const DomoList = function(props) {
     );
 };
 
+const createUpdateWindow = (csrf) => {
+    ReactDOM.render(
+        <UpdateWindow csrf={csrf} />,
+        document.querySelector("#domos")
+    );
+    ReactDOM.render(
+        <EmptySpace />,
+        document.querySelector("#makeDomo")
+    );
+};
+
 const loadDomosFromServer = () => {
     sendAjax('GET', '/getDomos', null, (data) => {
         ReactDOM.render(
@@ -71,7 +128,7 @@ const loadDomosFromServer = () => {
     });
 };
 
-const setup = function(csrf) {
+const createDomoWindow = (csrf) => {
     ReactDOM.render(
         <DomoForm csrf={csrf} />, document.querySelector("#makeDomo")
     );
@@ -81,6 +138,25 @@ const setup = function(csrf) {
     );
 
     loadDomosFromServer();
+}
+
+const setup = function(csrf) {
+    const updateButton = document.querySelector("#updateButton");
+    const domoButton = document.querySelector("#domoButton");
+
+    updateButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        createUpdateWindow(csrf);
+        return false;
+    });
+
+    domoButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        createDomoWindow(csrf);
+        return false;
+    });
+
+    createDomoWindow(csrf);
 };
 
 const getToken = () => {
