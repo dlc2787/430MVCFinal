@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const expressHandlebars = require('express-handlebars');
+const fileUpload = require('express-fileupload');
 const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
 const url = require('url');
@@ -56,6 +57,7 @@ const app = express();
 app.use('/assets', express.static(path.resolve(`${__dirname}/../hosted/`)));
 app.use(favicon(`${__dirname}/../hosted/img/favicon.png`));
 app.use(compression());
+app.use(fileUpload());
 app.use(bodyParser.urlencoded({
   extended: true,
 }));
@@ -81,7 +83,10 @@ app.use(cookieParser());
 
 app.use(csrf());
 app.use((err, req, res, next) => {
-  if (err.code !== 'EBADCSRFTOKEN') return next(err);
+  if (err.code !== 'EBADCSRFTOKEN') {
+    console.log('Good CSRF Token');
+    return next(err);
+  }
   console.log('Bad CSRF token');
   return false;
 });

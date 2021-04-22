@@ -52,8 +52,24 @@ const getDomos = (request, response) => {
   });
 };
 
+const uploadImage = (request, response) => {
+  const req = request;
+  const res = response;
+
+  if (!req.files || Object.keys(req.files).length === 0){
+    return res.status(400).json({ error: 'No file provided!'});
+  }
+
+  const { pic } = req.files;
+
+  console.log(pic);
+
+  return res.json({ redirect: '/maker' });
+};
+
 module.exports = {
   makerPage,
   make,
   getDomos,
+  uploadImage,
 };

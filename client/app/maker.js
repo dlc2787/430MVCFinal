@@ -1,14 +1,16 @@
-const handleDomo = (e) => {
+const handleUpload = (e) => {
     e.preventDefault();
 
     $("#domoMessage").animate({width:'hide'},350);
 
-    if($("#domoName").val() == '' || $("#domoAge").val() == '' ){
-        handleError("All fields are required.");
+    if(!$("#domoName").val()){
+        handleError("Please add an image to host!");
         return false;
     }
 
-    sendAjax('POST', $("#domoForm").attr("action"), $("#domoForm").serialize(), function() {
+    const data = new FormData($("#imgForm")[0]);
+
+    sendImageAjax('post', $("#imgForm").attr("action"), data, function() {
         loadDomosFromServer();
     });
 
@@ -57,23 +59,20 @@ const UpdateWindow = (props) => {
     );
 };
 
-const DomoForm = (props) => {
+const ImgForm = (props) => {
     return (
-        <form id="domoForm"
-            onSubmit={handleDomo}
-            name="domoForm"
-            action="/maker"
-            method="POST"
+        <form id="imgForm"
+            onSubmit={handleUpload}
+            name="imgForm"
+            action="/upload"
+            method="post"
+            encType="multipart/form-data"
             className="domoForm"
             >
-                <label htmlFor="name">Name: </label>
-                <input id="domoName" type="text" name="name" palceholder="Domo Name"/>
-                <label htmlFor="age">Age: </label>
-                <input id="domoAge" type="text" name="age" palceholder="Domo Age"/>
-                <label htmlFor="height">Height: </label>
-                <input id="domoHeight" type="text" name="height" palceholder="Domo Height"/>
+                <label htmlFor="pic">Image to Host: </label>
+                <input id="domoName" accept="image/*" type="file" name="pic" />
                 <input type="hidden" name="_csrf" value={props.csrf} />
-                <input className="nameDomoSubmit" type="submit" value="Make Domo" />
+                <input className="nameDomoSubmit" type="submit" value="Upload" />
             </form>
     );
 };
@@ -130,7 +129,7 @@ const loadDomosFromServer = () => {
 
 const createDomoWindow = (csrf) => {
     ReactDOM.render(
-        <DomoForm csrf={csrf} />, document.querySelector("#makeDomo")
+        <ImgForm csrf={csrf} />, document.querySelector("#makeDomo")
     );
 
     ReactDOM.render(

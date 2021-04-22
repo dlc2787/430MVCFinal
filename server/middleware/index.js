@@ -19,10 +19,13 @@ const requiresSecure = (req, res, next) => {
   return next();
 };
 
+const validateSpace = (req, res, next) => next();
+
 const bypassSecure = (req, res, next) => next();
 
 module.exports.requiresLogin = requiresLogin;
 module.exports.requiresLogout = requiresLogout;
+module.exports.validateSpace = validateSpace;
 
 if (process.env.NODE_ENV === 'production') {
   module.exports.requiresSecure = requiresSecure;

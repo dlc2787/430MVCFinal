@@ -1,17 +1,18 @@
 "use strict";
 
-var handleDomo = function handleDomo(e) {
+var handleUpload = function handleUpload(e) {
   e.preventDefault();
   $("#domoMessage").animate({
     width: 'hide'
   }, 350);
 
-  if ($("#domoName").val() == '' || $("#domoAge").val() == '') {
-    handleError("All fields are required.");
+  if (!$("#domoName").val()) {
+    handleError("Please add an image to host!");
     return false;
   }
 
-  sendAjax('POST', $("#domoForm").attr("action"), $("#domoForm").serialize(), function () {
+  var data = new FormData($("#imgForm")[0]);
+  sendImageAjax('post', $("#imgForm").attr("action"), data, function () {
     loadDomosFromServer();
   });
   return false;
@@ -78,35 +79,22 @@ var UpdateWindow = function UpdateWindow(props) {
   }));
 };
 
-var DomoForm = function DomoForm(props) {
+var ImgForm = function ImgForm(props) {
   return /*#__PURE__*/React.createElement("form", {
-    id: "domoForm",
-    onSubmit: handleDomo,
-    name: "domoForm",
-    action: "/maker",
-    method: "POST",
+    id: "imgForm",
+    onSubmit: handleUpload,
+    name: "imgForm",
+    action: "/upload",
+    method: "post",
+    encType: "multipart/form-data",
     className: "domoForm"
   }, /*#__PURE__*/React.createElement("label", {
-    htmlFor: "name"
-  }, "Name: "), /*#__PURE__*/React.createElement("input", {
+    htmlFor: "pic"
+  }, "Image to Host: "), /*#__PURE__*/React.createElement("input", {
     id: "domoName",
-    type: "text",
-    name: "name",
-    palceholder: "Domo Name"
-  }), /*#__PURE__*/React.createElement("label", {
-    htmlFor: "age"
-  }, "Age: "), /*#__PURE__*/React.createElement("input", {
-    id: "domoAge",
-    type: "text",
-    name: "age",
-    palceholder: "Domo Age"
-  }), /*#__PURE__*/React.createElement("label", {
-    htmlFor: "height"
-  }, "Height: "), /*#__PURE__*/React.createElement("input", {
-    id: "domoHeight",
-    type: "text",
-    name: "height",
-    palceholder: "Domo Height"
+    accept: "image/*",
+    type: "file",
+    name: "pic"
   }), /*#__PURE__*/React.createElement("input", {
     type: "hidden",
     name: "_csrf",
@@ -114,7 +102,7 @@ var DomoForm = function DomoForm(props) {
   }), /*#__PURE__*/React.createElement("input", {
     className: "nameDomoSubmit",
     type: "submit",
-    value: "Make Domo"
+    value: "Upload"
   }));
 };
 
@@ -169,7 +157,7 @@ var loadDomosFromServer = function loadDomosFromServer() {
 };
 
 var createDomoWindow = function createDomoWindow(csrf) {
-  ReactDOM.render( /*#__PURE__*/React.createElement(DomoForm, {
+  ReactDOM.render( /*#__PURE__*/React.createElement(ImgForm, {
     csrf: csrf
   }), document.querySelector("#makeDomo"));
   ReactDOM.render( /*#__PURE__*/React.createElement(DomoList, {
@@ -228,9 +216,25 @@ var sendAjax = function sendAjax(type, action, data, success) {
     type: type,
     url: action,
     data: data,
-    dataType: "json",
+    dataType: 'json',
     success: success,
     error: function error(xhr, status, _error) {
+      var messageObj = JSON.parse(xhr.responseText);
+      handleError(messageObj.error);
+    }
+  });
+};
+
+var sendImageAjax = function sendImageAjax(type, action, data, success) {
+  $.ajax({
+    cache: false,
+    type: type,
+    url: action,
+    data: data,
+    contentType: false,
+    processData: false,
+    success: success,
+    error: function error(xhr, status, _error2) {
       var messageObj = JSON.parse(xhr.responseText);
       handleError(messageObj.error);
     }

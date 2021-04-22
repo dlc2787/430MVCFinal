@@ -16,6 +16,11 @@ const AccountSchema = new mongoose.Schema({
     unique: true,
     match: /^[A-Za-z0-9_\-.]{1,16}$/,
   },
+  slots: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
   salt: {
     type: Buffer,
     required: true,

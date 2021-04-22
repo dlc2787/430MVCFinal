@@ -173,9 +173,25 @@ var sendAjax = function sendAjax(type, action, data, success) {
     type: type,
     url: action,
     data: data,
-    dataType: "json",
+    dataType: 'json',
     success: success,
     error: function error(xhr, status, _error) {
+      var messageObj = JSON.parse(xhr.responseText);
+      handleError(messageObj.error);
+    }
+  });
+};
+
+var sendImageAjax = function sendImageAjax(type, action, data, success) {
+  $.ajax({
+    cache: false,
+    type: type,
+    url: action,
+    data: data,
+    contentType: false,
+    processData: false,
+    success: success,
+    error: function error(xhr, status, _error2) {
       var messageObj = JSON.parse(xhr.responseText);
       handleError(messageObj.error);
     }

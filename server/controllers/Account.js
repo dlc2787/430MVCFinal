@@ -75,6 +75,7 @@ const signup = (request, response) => {
     const accountData = {
       username: req.body.username,
       salt,
+      slots: 3,
       password: hash,
     };
 

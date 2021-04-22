@@ -12,6 +12,7 @@ const router = (app) => {
   app.post('/maker', mid.requiresLogin, controllers.Domo.make);
   app.post('/updatePass', mid.requiresSecure, mid.requiresLogin, controllers.Account.updatePass);
   app.get('/', mid.requiresSecure, mid.requiresLogout, controllers.Account.loginPage);
+  app.post('/upload', mid.requiresLogin, mid.validateSpace, controllers.Domo.uploadImage);
 };
 
 module.exports = router;
