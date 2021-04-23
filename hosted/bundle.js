@@ -13,7 +13,7 @@ var handleUpload = function handleUpload(e) {
 
   var data = new FormData($("#imgForm")[0]);
   sendImageAjax('post', $("#imgForm").attr("action"), data, function () {
-    loadDomosFromServer();
+    loadImagesFromServer();
   });
   return false;
 }; //password update
@@ -110,19 +110,19 @@ var EmptySpace = function EmptySpace() {
   return /*#__PURE__*/React.createElement("div", null);
 };
 
-var DomoList = function DomoList(props) {
-  if (props.domos.length === 0) {
+var ImageList = function ImageList(props) {
+  if (props.images.length === 0) {
     return /*#__PURE__*/React.createElement("div", {
       className: "domoList"
     }, /*#__PURE__*/React.createElement("h3", {
       className: "emptyDomo"
-    }, " No Domos yet"));
+    }, " No Images yet"));
   }
 
   ;
-  var domoNodes = props.domos.map(function (domo) {
+  var imageNodes = props.images.map(function (image) {
     return /*#__PURE__*/React.createElement("div", {
-      key: domo._id,
+      key: image._id,
       className: "domo"
     }, /*#__PURE__*/React.createElement("img", {
       src: "/assets/img/domoface.jpeg",
@@ -130,15 +130,11 @@ var DomoList = function DomoList(props) {
       className: "domoFace"
     }), /*#__PURE__*/React.createElement("h3", {
       className: "domoName"
-    }, "Name: ", domo.name, " "), /*#__PURE__*/React.createElement("h3", {
-      className: "domoAge"
-    }, "Age: ", domo.age, " "), /*#__PURE__*/React.createElement("h3", {
-      className: "domoAge"
-    }, "Height: ", domo.height, " "));
+    }, "Name: ", image.name, " "));
   });
   return /*#__PURE__*/React.createElement("div", {
     className: "domoList"
-  }, domoNodes);
+  }, imageNodes);
 };
 
 var createUpdateWindow = function createUpdateWindow(csrf) {
@@ -148,38 +144,38 @@ var createUpdateWindow = function createUpdateWindow(csrf) {
   ReactDOM.render( /*#__PURE__*/React.createElement(EmptySpace, null), document.querySelector("#makeDomo"));
 };
 
-var loadDomosFromServer = function loadDomosFromServer() {
+var loadImagesFromServer = function loadImagesFromServer() {
   sendAjax('GET', '/getDomos', null, function (data) {
-    ReactDOM.render( /*#__PURE__*/React.createElement(DomoList, {
-      domos: data.domos
+    ReactDOM.render( /*#__PURE__*/React.createElement(ImageList, {
+      images: data.images
     }), document.querySelector("#domos"));
   });
 };
 
-var createDomoWindow = function createDomoWindow(csrf) {
+var createDisplayWindow = function createDisplayWindow(csrf) {
   ReactDOM.render( /*#__PURE__*/React.createElement(ImgForm, {
     csrf: csrf
   }), document.querySelector("#makeDomo"));
-  ReactDOM.render( /*#__PURE__*/React.createElement(DomoList, {
-    domos: []
+  ReactDOM.render( /*#__PURE__*/React.createElement(ImageList, {
+    images: []
   }), document.querySelector("#domos"));
-  loadDomosFromServer();
+  loadImagesFromServer();
 };
 
 var setup = function setup(csrf) {
   var updateButton = document.querySelector("#updateButton");
-  var domoButton = document.querySelector("#domoButton");
+  var displayButton = document.querySelector("#domoButton");
   updateButton.addEventListener("click", function (e) {
     e.preventDefault();
     createUpdateWindow(csrf);
     return false;
   });
-  domoButton.addEventListener("click", function (e) {
+  displayButton.addEventListener("click", function (e) {
     e.preventDefault();
-    createDomoWindow(csrf);
+    createDisplayWindow(csrf);
     return false;
   });
-  createDomoWindow(csrf);
+  createDisplayWindow(csrf);
 };
 
 var getToken = function getToken() {

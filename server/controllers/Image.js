@@ -1,21 +1,19 @@
 const models = require('../models');
 
-const { Domo } = models;
+const { Image } = models;
 
 const makerPage = (req, res) => {
-  Domo.DomoModel.findByOwner(req.session.account._id, (err, docs) => {
+  Image.ImageModel.findByOwner(req.session.account._id, (err, docs) => {
     if (err) {
       console.log(err);
       return res.status(400).json({ error: 'An error ooccured!' });
     }
-    return res.render('app', { csrfToken: req.csrfToken(), domos: docs });
+    return res.render('app', { csrfToken: req.csrfToken(), images: docs });
   });
 };
 
+/*
 const make = (req, res) => {
-  if (!req.body.name || !req.body.age || !req.body.height) {
-    return res.status(400).json({ error: 'All fields are requried' });
-  }
 
   const domoData = {
     name: req.body.name,
@@ -37,39 +35,49 @@ const make = (req, res) => {
   });
   return domoPromise;
 };
+*/
 
-const getDomos = (request, response) => {
+const getImages = (request, response) => {
   const req = request;
   const res = response;
 
-  return Domo.DomoModel.findByOwner(req.session.account._id, (err, docs) => {
+  return Image.ImageModel.findByOwner(req.session.account._id, (err, docs) => {
     if (err) {
       console.log(err);
       return res.status(400).json({ error: 'An error occurred' });
     }
 
-    return res.json({ domos: docs });
+    return res.json({ images: docs });
   });
 };
 
+//upload a new image
 const uploadImage = (request, response) => {
   const req = request;
   const res = response;
 
-  if (!req.files || Object.keys(req.files).length === 0){
-    return res.status(400).json({ error: 'No file provided!'});
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).json({ error: 'No file provided!' });
   }
 
   const { pic } = req.files;
+  pic.owner = req.session.account._id;
 
-  console.log(pic);
+  const newImage = new Image.ImageModel(pic);
+  const promise = newImage.save();
+  promise.then(() => {
+    res.status(201).json({ message: "Image uploaded!"});
+  });
+  promise.catch((err) => {
+    console.dir(err);
+    res.status(400).json({ error: "Error uploading"});
+  });
 
   return res.json({ redirect: '/maker' });
 };
 
 module.exports = {
   makerPage,
-  make,
-  getDomos,
+  getImages,
   uploadImage,
 };

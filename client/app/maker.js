@@ -11,7 +11,7 @@ const handleUpload = (e) => {
     const data = new FormData($("#imgForm")[0]);
 
     sendImageAjax('post', $("#imgForm").attr("action"), data, function() {
-        loadDomosFromServer();
+        loadImagesFromServer();
     });
 
     return false;
@@ -81,29 +81,27 @@ const EmptySpace = () => {
     return (<div></div>);
 }
 
-const DomoList = function(props) {
-    if (props.domos.length === 0) {
+const ImageList = function(props) {
+    if (props.images.length === 0) {
         return (
             <div className="domoList">
-                <h3 className="emptyDomo"> No Domos yet</h3>
+                <h3 className="emptyDomo"> No Images yet</h3>
             </div>
         );
     };
 
-    const domoNodes = props.domos.map(function(domo) {
+    const imageNodes = props.images.map(function(image) {
         return (
-            <div key={domo._id} className="domo">
+            <div key={image._id} className="domo">
                 <img src="/assets/img/domoface.jpeg" alt="domo face" className="domoFace" />
-                <h3 className="domoName">Name: {domo.name} </h3>
-                <h3 className="domoAge">Age: {domo.age} </h3>
-                <h3 className="domoAge">Height: {domo.height} </h3>
+                <h3 className="domoName">Name: {image.name} </h3>
             </div>
         );
     });
 
     return (
         <div className="domoList">
-            {domoNodes}
+            {imageNodes}
         </div>
     );
 };
@@ -119,29 +117,29 @@ const createUpdateWindow = (csrf) => {
     );
 };
 
-const loadDomosFromServer = () => {
+const loadImagesFromServer = () => {
     sendAjax('GET', '/getDomos', null, (data) => {
         ReactDOM.render(
-            <DomoList domos={data.domos} />, document.querySelector("#domos")
+            <ImageList images={data.images} />, document.querySelector("#domos")
         );
     });
 };
 
-const createDomoWindow = (csrf) => {
+const createDisplayWindow = (csrf) => {
     ReactDOM.render(
         <ImgForm csrf={csrf} />, document.querySelector("#makeDomo")
     );
 
     ReactDOM.render(
-        <DomoList domos={[]} />, document.querySelector("#domos")
+        <ImageList images={[]} />, document.querySelector("#domos")
     );
 
-    loadDomosFromServer();
+    loadImagesFromServer();
 }
 
 const setup = function(csrf) {
     const updateButton = document.querySelector("#updateButton");
-    const domoButton = document.querySelector("#domoButton");
+    const displayButton = document.querySelector("#domoButton");
 
     updateButton.addEventListener("click", (e) => {
         e.preventDefault();
@@ -149,13 +147,13 @@ const setup = function(csrf) {
         return false;
     });
 
-    domoButton.addEventListener("click", (e) => {
+    displayButton.addEventListener("click", (e) => {
         e.preventDefault();
-        createDomoWindow(csrf);
+        createDisplayWindow(csrf);
         return false;
     });
 
-    createDomoWindow(csrf);
+    createDisplayWindow(csrf);
 };
 
 const getToken = () => {
