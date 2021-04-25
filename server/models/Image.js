@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
-//const _ = require('underscore');
+// const _ = require('underscore');
 
 let ImageModel = {};
 
 const convertId = mongoose.Types.ObjectId;
-//const setName = (name) => _.escape(name).trim();
+// const setName = (name) => _.escape(name).trim();
 
 const ImageSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    trim: true,
+    unique: true,
   },
   owner: {
     type: mongoose.Schema.ObjectId,

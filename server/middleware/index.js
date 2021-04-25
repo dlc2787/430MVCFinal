@@ -19,7 +19,12 @@ const requiresSecure = (req, res, next) => {
   return next();
 };
 
-const validateSpace = (req, res, next) => next();
+const validateSpace = (req, res, next) => {
+  if (req.session.account.slots <= 0) {
+    return res.redirect('/maker');
+  }
+  return next();
+};
 
 const bypassSecure = (req, res, next) => next();
 

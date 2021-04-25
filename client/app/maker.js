@@ -38,6 +38,16 @@ const handleUpdate = (e) => {
     return false;
 }
 
+const handleUpgrade = (e) => {
+    e.preventDefault();
+
+    $("#domoMessage").animate({width:'hide'},350);
+
+    sendAjax('POST', $("#preForm").attr("action"), $("#preForm").serialize(), redirect);
+
+    return false
+}
+
 const UpdateWindow = (props) => {
     return (
     <form   id="updateForm"
@@ -74,6 +84,24 @@ const ImgForm = (props) => {
                 <input type="hidden" name="_csrf" value={props.csrf} />
                 <input className="nameDomoSubmit" type="submit" value="Upload" />
             </form>
+    );
+};
+
+const PremiumForm = (props) => {
+    return (
+        <div>
+        <h2>Upgrade to Premium Account</h2>
+        <form id="preForm"
+            onSubmit={handleUpgrade}
+            name="preForm"
+            action="/upgrade"
+            method="post"
+            className="domoForm"
+            >
+                <input type="hidden" name="_csrf" value={props.csrf} />
+                <input className="nameDomoSubmit" type="submit" value="Upgrade!" />
+            </form>
+        </div>
     );
 };
 
@@ -137,9 +165,20 @@ const createDisplayWindow = (csrf) => {
     loadImagesFromServer();
 }
 
+const createUpgradeWindow = (csrf) => {
+    ReactDOM.render(
+        <PremiumForm csrf={csrf} />, document.querySelector("#domos")
+    );
+    ReactDOM.render(
+        <EmptySpace />,
+        document.querySelector("#makeDomo")
+    );
+}
+
 const setup = function(csrf) {
     const updateButton = document.querySelector("#updateButton");
     const displayButton = document.querySelector("#domoButton");
+    const upgradeButton = document.querySelector("#upgradeButton");
 
     updateButton.addEventListener("click", (e) => {
         e.preventDefault();
@@ -150,6 +189,12 @@ const setup = function(csrf) {
     displayButton.addEventListener("click", (e) => {
         e.preventDefault();
         createDisplayWindow(csrf);
+        return false;
+    });
+
+    upgradeButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        createUpgradeWindow(csrf);
         return false;
     });
 

@@ -1,6 +1,7 @@
 const models = require('../models');
 
 const { Image } = models;
+const { Account } = models;
 
 const makerPage = (req, res) => {
   Image.ImageModel.findByOwner(req.session.account._id, (err, docs) => {
@@ -8,7 +9,7 @@ const makerPage = (req, res) => {
       console.log(err);
       return res.status(400).json({ error: 'An error ooccured!' });
     }
-    return res.render('app', { csrfToken: req.csrfToken(), images: docs });
+    return res.render('app', { csrfToken: req.csrfToken(), images: docs, slots: req.session.account.slots });
   });
 };
 
@@ -46,12 +47,29 @@ const getImages = (request, response) => {
       console.log(err);
       return res.status(400).json({ error: 'An error occurred' });
     }
-
     return res.json({ images: docs });
   });
 };
 
-//upload a new image
+// method for updating mongoDB with account info
+const updateDB = (res, req, account) => {
+  const savePromise = account.save();
+  savePromise.then(() => {
+    req.session.account = Account.AccountModel.toAPI(account);
+    return res.json({ redirect: '/maker' });
+  });
+  savePromise.catch((err) => {
+    console.log(err);
+
+    if (err.code === 11000) {
+      return res.status(400).json({ error: 'Username already in use.' });
+    }
+
+    return res.status(400).json({ error: 'An error occoured :(' });
+  });
+};
+
+// upload a new image
 const uploadImage = (request, response) => {
   const req = request;
   const res = response;
@@ -66,14 +84,23 @@ const uploadImage = (request, response) => {
   const newImage = new Image.ImageModel(pic);
   const promise = newImage.save();
   promise.then(() => {
-    res.status(201).json({ message: "Image uploaded!"});
+    Account.AccountModel.findByUsername(req.session.account.username, (err, doc) => {
+      if (err) {
+        res.status(400).json({ error: 'Account not found' });
+      }
+
+      const user = doc;
+      user.slots = user.slots - 1;
+
+      return updateDB(res, req, user);
+    });
   });
   promise.catch((err) => {
     console.dir(err);
-    res.status(400).json({ error: "Error uploading"});
+    res.status(400).json({ error: 'Error uploading' });
   });
 
-  return res.json({ redirect: '/maker' });
+  return promise;
 };
 
 module.exports = {

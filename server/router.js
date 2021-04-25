@@ -11,7 +11,8 @@ const router = (app) => {
   app.get('/maker', mid.requiresLogin, controllers.Image.makerPage);
   app.post('/updatePass', mid.requiresSecure, mid.requiresLogin, controllers.Account.updatePass);
   app.get('/', mid.requiresSecure, mid.requiresLogout, controllers.Account.loginPage);
-  app.post('/upload', mid.requiresLogin, mid.validateSpace, controllers.Image.uploadImage);
+  app.post('/upload', mid.requiresLogin, mid.requiresSecure, mid.validateSpace, controllers.Image.uploadImage);
+  app.post('/upgrade', mid.requiresLogin, mid.requiresSecure, controllers.Account.upgradeAccount);
 };
 
 module.exports = router;

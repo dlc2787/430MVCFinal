@@ -39,6 +39,15 @@ var handleUpdate = function handleUpdate(e) {
   return false;
 };
 
+var handleUpgrade = function handleUpgrade(e) {
+  e.preventDefault();
+  $("#domoMessage").animate({
+    width: 'hide'
+  }, 350);
+  sendAjax('POST', $("#preForm").attr("action"), $("#preForm").serialize(), redirect);
+  return false;
+};
+
 var UpdateWindow = function UpdateWindow(props) {
   return /*#__PURE__*/React.createElement("form", {
     id: "updateForm",
@@ -106,6 +115,25 @@ var ImgForm = function ImgForm(props) {
   }));
 };
 
+var PremiumForm = function PremiumForm(props) {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", null, "Upgrade to Premium Account"), /*#__PURE__*/React.createElement("form", {
+    id: "preForm",
+    onSubmit: handleUpgrade,
+    name: "preForm",
+    action: "/upgrade",
+    method: "post",
+    className: "domoForm"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "hidden",
+    name: "_csrf",
+    value: props.csrf
+  }), /*#__PURE__*/React.createElement("input", {
+    className: "nameDomoSubmit",
+    type: "submit",
+    value: "Upgrade!"
+  })));
+};
+
 var EmptySpace = function EmptySpace() {
   return /*#__PURE__*/React.createElement("div", null);
 };
@@ -162,9 +190,17 @@ var createDisplayWindow = function createDisplayWindow(csrf) {
   loadImagesFromServer();
 };
 
+var createUpgradeWindow = function createUpgradeWindow(csrf) {
+  ReactDOM.render( /*#__PURE__*/React.createElement(PremiumForm, {
+    csrf: csrf
+  }), document.querySelector("#domos"));
+  ReactDOM.render( /*#__PURE__*/React.createElement(EmptySpace, null), document.querySelector("#makeDomo"));
+};
+
 var setup = function setup(csrf) {
   var updateButton = document.querySelector("#updateButton");
   var displayButton = document.querySelector("#domoButton");
+  var upgradeButton = document.querySelector("#upgradeButton");
   updateButton.addEventListener("click", function (e) {
     e.preventDefault();
     createUpdateWindow(csrf);
@@ -173,6 +209,11 @@ var setup = function setup(csrf) {
   displayButton.addEventListener("click", function (e) {
     e.preventDefault();
     createDisplayWindow(csrf);
+    return false;
+  });
+  upgradeButton.addEventListener("click", function (e) {
+    e.preventDefault();
+    createUpgradeWindow(csrf);
     return false;
   });
   createDisplayWindow(csrf);

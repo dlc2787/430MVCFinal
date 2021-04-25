@@ -117,6 +117,29 @@ const updatePass = (request, response) => {
   });
 };
 
+// upgrade to a premium account
+const upgradeAccount = (request, response) => {
+  const req = request;
+  const res = response;
+
+  Account.AccountModel.findByUsername(req.session.account.username, (err, doc) => {
+    if (err) {
+      return res.status(400).json({ error: 'Account not found' });
+    }
+
+    if (doc.premium) {
+      return res.status(200).json({ error: 'Your account is already premium!' });
+    }
+
+    const user = doc;
+
+    user.slots += 5;
+    user.premium = true;
+
+    return updateDB(res, req, user);
+  });
+};
+
 const getToken = (request, response) => {
   const req = request;
   const res = response;
@@ -135,4 +158,5 @@ module.exports = {
   signup,
   getToken,
   updatePass,
+  upgradeAccount,
 };
