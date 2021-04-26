@@ -187,7 +187,6 @@ nav:nth-child(1) {
     -ms-transform: rotate(330deg);
     -webkit-transform: rotate(330deg); 
     transform: rotate(330deg);
-    cursor: pointer;
 }
 
 #domos {
@@ -210,6 +209,7 @@ nav:nth-child(1) {
     padding: 10px;
     min-height:60px;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .domo:hover {
