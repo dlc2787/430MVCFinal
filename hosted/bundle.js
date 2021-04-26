@@ -48,6 +48,10 @@ var handleUpgrade = function handleUpgrade(e) {
   return false;
 };
 
+var visitImage = function visitImage(name) {
+  window.location = "/image?image=".concat(name);
+};
+
 var UpdateWindow = function UpdateWindow(props) {
   return /*#__PURE__*/React.createElement("form", {
     id: "updateForm",
@@ -134,6 +138,15 @@ var PremiumForm = function PremiumForm(props) {
   })));
 };
 
+var Advertisement = function Advertisement() {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("a", {
+    href: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/assets/img/ad.png",
+    alt: "a wonderful advertisement :)"
+  })));
+};
+
 var EmptySpace = function EmptySpace() {
   return /*#__PURE__*/React.createElement("div", null);
 };
@@ -151,10 +164,13 @@ var ImageList = function ImageList(props) {
   var imageNodes = props.images.map(function (image) {
     return /*#__PURE__*/React.createElement("div", {
       key: image._id,
-      className: "domo"
+      className: "domo",
+      onClick: function onClick() {
+        return visitImage(image.name);
+      }
     }, /*#__PURE__*/React.createElement("img", {
       src: "/assets/img/domoface.jpeg",
-      alt: "domo face",
+      alt: "img",
       className: "domoFace"
     }), /*#__PURE__*/React.createElement("h3", {
       className: "domoName"
@@ -173,7 +189,7 @@ var createUpdateWindow = function createUpdateWindow(csrf) {
 };
 
 var loadImagesFromServer = function loadImagesFromServer() {
-  sendAjax('GET', '/getDomos', null, function (data) {
+  sendAjax('GET', '/getImages', null, function (data) {
     ReactDOM.render( /*#__PURE__*/React.createElement(ImageList, {
       images: data.images
     }), document.querySelector("#domos"));
@@ -197,6 +213,10 @@ var createUpgradeWindow = function createUpgradeWindow(csrf) {
   ReactDOM.render( /*#__PURE__*/React.createElement(EmptySpace, null), document.querySelector("#makeDomo"));
 };
 
+var handleAds = function handleAds() {
+  ReactDOM.render( /*#__PURE__*/React.createElement(Advertisement, null), document.querySelector("#ads"));
+};
+
 var setup = function setup(csrf) {
   var updateButton = document.querySelector("#updateButton");
   var displayButton = document.querySelector("#domoButton");
@@ -217,6 +237,7 @@ var setup = function setup(csrf) {
     return false;
   });
   createDisplayWindow(csrf);
+  handleAds();
 };
 
 var getToken = function getToken() {

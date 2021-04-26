@@ -1,7 +1,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <title>DomoMaker</title>
+  <title>Image Webhosting</title>
   <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
@@ -14,13 +14,15 @@
   <nav><a href="/login"><img id="logo" src="/assets/img/face.png" alt="face logo"/></a>
     <div class="navlink"><a href="/logout">Log out</a></div>
     <div class="navlink"><a id="updateButton" href="/updatePass">Change Password</a></div>
-    <div class="navlink"><a id="domoButton" href="/maker">Images</a></div>
+    <div class="navlink"><a id="domoButton" href="/uploads">Images</a></div>
     <div class="navlink"><a id="upgradeButton" href="/upgrade">Upgrade</a></div>
     <div>Slots Remaining: {{slots}}</div>
   </nav>
   <section id="makeDomo">
   </section>
   <section id="domos">
+  </section>
+  <section id="ads">
   </section>
   <div id="domoMessage"><img id="speech" src="/assets/img/speech.png" alt="speech box"/>
     <h3><span id="errorMessage"></span></h3><img id="domo" src="assets/img/domo.png" alt="domo"/>

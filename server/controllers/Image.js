@@ -3,7 +3,7 @@ const models = require('../models');
 const { Image } = models;
 const { Account } = models;
 
-const makerPage = (req, res) => {
+const uploadsPage = (req, res) => {
   Image.ImageModel.findByOwner(req.session.account._id, (err, docs) => {
     if (err) {
       console.log(err);
@@ -26,7 +26,7 @@ const make = (req, res) => {
   const newDomo = new Domo.DomoModel(domoData);
 
   const domoPromise = newDomo.save();
-  domoPromise.then(() => res.json({ redirect: '/maker' }));
+  domoPromise.then(() => res.json({ redirect: '/uploads' }));
   domoPromise.catch((err) => {
     console.log(err);
     if (err.code === 11000) {
@@ -56,7 +56,7 @@ const updateDB = (res, req, account) => {
   const savePromise = account.save();
   savePromise.then(() => {
     req.session.account = Account.AccountModel.toAPI(account);
-    return res.json({ redirect: '/maker' });
+    return res.json({ redirect: '/uploads' });
   });
   savePromise.catch((err) => {
     console.log(err);
@@ -90,7 +90,7 @@ const uploadImage = (request, response) => {
       }
 
       const user = doc;
-      user.slots = user.slots - 1;
+      user.slots -= 1;
 
       return updateDB(res, req, user);
     });
@@ -103,8 +103,31 @@ const uploadImage = (request, response) => {
   return promise;
 };
 
+const getImageByName = (request, response) => {
+  const req = request;
+  const res = response;
+
+  if (!req.query.image){
+    return res.status(400).json({ error: 'Image Name Upspecified' });
+  }
+
+  Image.ImageModel.findOne({ name: req.query.image }, (err, doc) => {
+    if (err){
+      console.dir(err);
+      return res.status(400).json({ error: `An error occured retrieving ${req.query.image}.`});
+    }
+    if (!doc){
+      return res.status(404).json({ error: `${req.query.image} not found!`});
+    }
+
+    res.writeHead(200, {'Content-Type': doc.mimetype, 'Content-Length': doc.size});
+    return res.end(doc.data);
+  });
+};
+
 module.exports = {
-  makerPage,
+  uploadsPage,
   getImages,
   uploadImage,
+  getImageByName,
 };

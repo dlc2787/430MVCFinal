@@ -31,7 +31,7 @@ const login = (request, response) => {
 
     req.session.account = Account.AccountModel.toAPI(account);
 
-    return res.json({ redirect: '/maker' });
+    return res.json({ redirect: '/uploads' });
   });
 };
 
@@ -40,7 +40,7 @@ const updateDB = (res, req, account) => {
   const savePromise = account.save();
   savePromise.then(() => {
     req.session.account = Account.AccountModel.toAPI(account);
-    return res.json({ redirect: '/maker' });
+    return res.json({ redirect: '/uploads' });
   });
   savePromise.catch((err) => {
     console.log(err);

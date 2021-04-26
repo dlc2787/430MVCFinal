@@ -48,6 +48,10 @@ const handleUpgrade = (e) => {
     return false
 }
 
+const visitImage = (name) => {
+    window.location = `/image?image=${name}`;
+}
+
 const UpdateWindow = (props) => {
     return (
     <form   id="updateForm"
@@ -105,6 +109,16 @@ const PremiumForm = (props) => {
     );
 };
 
+const Advertisement = () => {
+    return (
+        <div>
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+            <img src="/assets/img/ad.png" alt="a wonderful advertisement :)"></img>
+            </a>
+        </div>
+    );
+};
+
 const EmptySpace = () => {
     return (<div></div>);
 }
@@ -120,8 +134,8 @@ const ImageList = function(props) {
 
     const imageNodes = props.images.map(function(image) {
         return (
-            <div key={image._id} className="domo">
-                <img src="/assets/img/domoface.jpeg" alt="domo face" className="domoFace" />
+            <div key={image._id} className="domo" onClick={() => visitImage(image.name)}>
+                <img src="/assets/img/domoface.jpeg" alt="img" className="domoFace" />
                 <h3 className="domoName">Name: {image.name} </h3>
             </div>
         );
@@ -146,7 +160,7 @@ const createUpdateWindow = (csrf) => {
 };
 
 const loadImagesFromServer = () => {
-    sendAjax('GET', '/getDomos', null, (data) => {
+    sendAjax('GET', '/getImages', null, (data) => {
         ReactDOM.render(
             <ImageList images={data.images} />, document.querySelector("#domos")
         );
@@ -163,7 +177,7 @@ const createDisplayWindow = (csrf) => {
     );
 
     loadImagesFromServer();
-}
+};
 
 const createUpgradeWindow = (csrf) => {
     ReactDOM.render(
@@ -173,7 +187,13 @@ const createUpgradeWindow = (csrf) => {
         <EmptySpace />,
         document.querySelector("#makeDomo")
     );
-}
+};
+
+const handleAds = () => {
+    ReactDOM.render(
+        <Advertisement/>, document.querySelector("#ads")
+    );
+};
 
 const setup = function(csrf) {
     const updateButton = document.querySelector("#updateButton");
@@ -199,6 +219,7 @@ const setup = function(csrf) {
     });
 
     createDisplayWindow(csrf);
+    handleAds();
 };
 
 const getToken = () => {

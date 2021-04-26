@@ -7,7 +7,7 @@ const requiresLogin = (req, res, next) => {
 
 const requiresLogout = (req, res, next) => {
   if (req.session.account) {
-    return res.redirect('/maker');
+    return res.redirect('/uploads');
   }
   return next();
 };
@@ -21,7 +21,7 @@ const requiresSecure = (req, res, next) => {
 
 const validateSpace = (req, res, next) => {
   if (req.session.account.slots <= 0) {
-    return res.redirect('/maker');
+    return res.redirect('/uploads');
   }
   return next();
 };
