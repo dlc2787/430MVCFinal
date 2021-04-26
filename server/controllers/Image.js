@@ -107,20 +107,20 @@ const getImageByName = (request, response) => {
   const req = request;
   const res = response;
 
-  if (!req.query.image){
+  if (!req.query.image) {
     return res.status(400).json({ error: 'Image Name Upspecified' });
   }
 
-  Image.ImageModel.findOne({ name: req.query.image }, (err, doc) => {
-    if (err){
+  return Image.ImageModel.findOne({ name: req.query.image }, (err, doc) => {
+    if (err) {
       console.dir(err);
-      return res.status(400).json({ error: `An error occured retrieving ${req.query.image}.`});
+      return res.status(400).json({ error: `An error occured retrieving ${req.query.image}.` });
     }
-    if (!doc){
-      return res.status(404).json({ error: `${req.query.image} not found!`});
+    if (!doc) {
+      return res.status(404).json({ error: `${req.query.image} not found!` });
     }
 
-    res.writeHead(200, {'Content-Type': doc.mimetype, 'Content-Length': doc.size});
+    res.writeHead(200, { 'Content-Type': doc.mimetype, 'Content-Length': doc.size });
     return res.end(doc.data);
   });
 };
