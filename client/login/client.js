@@ -2,7 +2,7 @@
 const handleLogin = (e) => {
     e.preventDefault();
 
-    $("#domoMessage").animate({width:'hide'},350);
+    $("#serverMessage").animate({width:'hide'},350);
 
     if($("#user").val() == '' || $("#pass").val() == ''){
         handleError("Username or password is empty.");
@@ -20,7 +20,7 @@ const handleLogin = (e) => {
 const handleSignup = (e) => {
     e.preventDefault();
 
-    $("#domoMessage").animate({width:'hide'},350);
+    $("#serverMessage").animate({width:'hide'},350);
 
     if($("#user").val() == '' || $("#pass").val() == '' || $("#pass2").val() == '') {
         handleError("All fields are required.");

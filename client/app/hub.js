@@ -1,9 +1,9 @@
-const handleUpload = (e) => {
+const handleUpload = (e, csrf) => {
     e.preventDefault();
 
-    $("#domoMessage").animate({width:'hide'},350);
+    $("#serverMessage").animate({width:'hide'},350);
 
-    if(!$("#domoName").val()){
+    if(!$("#imgName").val()){
         handleError("Please add an image to host!");
         return false;
     }
@@ -11,7 +11,8 @@ const handleUpload = (e) => {
     const data = new FormData($("#imgForm")[0]);
 
     sendImageAjax('post', $("#imgForm").attr("action"), data, function() {
-        loadImagesFromServer();
+        loadImagesFromServer(csrf);
+        updateSlots();
     });
 
     return false;
@@ -21,7 +22,7 @@ const handleUpload = (e) => {
 const handleUpdate = (e) => {
     e.preventDefault();
 
-    $("#domoMessage").animate({width:'hide'},350);
+    $("#serverMessage").animate({width:'hide'},350);
 
     if($("#pass").val() == '' || $("#newPass").val() == '' || $("#newPass2").val() == '') {
         handleError("All fields are required.");
@@ -41,7 +42,7 @@ const handleUpdate = (e) => {
 const handleUpgrade = (e) => {
     e.preventDefault();
 
-    $("#domoMessage").animate({width:'hide'},350);
+    $("#serverMessage").animate({width:'hide'},350);
 
     sendAjax('POST', $("#preForm").attr("action"), $("#preForm").serialize(), redirect);
 
@@ -50,6 +51,27 @@ const handleUpgrade = (e) => {
 
 const visitImage = (name) => {
     window.location = `/image?image=${name}`;
+}
+
+const removeImage = (e, formId, csrf) => {
+    e.preventDefault();
+
+    $("#serverMessage").animate({width:'hide'},350);
+
+    sendAjax('POST', $(`#${formId}`).attr("action"), $(`#${formId}`).serialize(), function() {
+        loadImagesFromServer(csrf);
+        updateSlots();
+    });
+}
+
+const copyUrl = (imgname, callbutton) => {
+    const copyurl = $(`#${imgname}`);
+    copyurl.select();
+    document.execCommand("copy");
+    ReactDOM.render(
+        "Copied!",
+        document.querySelector(`#${callbutton}`)
+    );
 }
 
 const UpdateWindow = (props) => {
@@ -76,17 +98,17 @@ const UpdateWindow = (props) => {
 const ImgForm = (props) => {
     return (
         <form id="imgForm"
-            onSubmit={handleUpload}
+            onSubmit={ (e) => handleUpload(e, props.csrf) }
             name="imgForm"
             action="/upload"
             method="post"
             encType="multipart/form-data"
-            className="domoForm"
+            className="imageForm"
             >
                 <label htmlFor="pic">Image to Host: </label>
-                <input id="domoName" accept="image/*" type="file" name="pic" />
+                <input id="imgName" accept="image/*" type="file" name="pic" />
                 <input type="hidden" name="_csrf" value={props.csrf} />
-                <input className="nameDomoSubmit" type="submit" value="Upload" />
+                <input className="imageSubmit" type="submit" value="Upload" />
             </form>
     );
 };
@@ -100,23 +122,42 @@ const PremiumForm = (props) => {
             name="preForm"
             action="/upgrade"
             method="post"
-            className="domoForm"
+            className="imageForm"
             >
                 <input type="hidden" name="_csrf" value={props.csrf} />
-                <input className="nameDomoSubmit" type="submit" value="Upgrade!" />
+                <input className="imageSubmit" type="submit" value="Upgrade!" />
             </form>
         </div>
     );
 };
 
-const Advertisement = () => {
+const SlotStatus = (props) => {
     return (
-        <div>
-            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
-            <img src="/assets/img/ad.png" alt="a wonderful advertisement :)"></img>
-            </a>
-        </div>
+        <span>
+            Slots Remaining: {props.slots}
+        </span>
     );
+};
+
+const Advertisement = (props) => {
+    if (!props.isPremium)
+    {
+        return (
+            <div>
+                <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+              <img src="/assets/img/ad.png" alt="a wonderful advertisement :)"></img>
+              </a>
+           </div>
+        );
+    }
+    else
+    {
+        return (
+            <div>
+                <img src="/assets/img/premium.png" alt="Thank you!"></img>
+            </div>
+        );
+    }
 };
 
 const EmptySpace = () => {
@@ -126,23 +167,37 @@ const EmptySpace = () => {
 const ImageList = function(props) {
     if (props.images.length === 0) {
         return (
-            <div className="domoList">
-                <h3 className="emptyDomo"> No Images yet</h3>
+            <div className="imgList">
+                <h3 className="emptyBlock"> Use the form at the top of the page to host your first image!</h3>
             </div>
         );
     };
 
+    //big block for image display
     const imageNodes = props.images.map(function(image) {
         return (
-            <div key={image._id} className="domo" onClick={() => visitImage(image.name)}>
-                <img src="/assets/img/domoface.jpeg" alt="img" className="domoFace" />
-                <h3 className="domoName">Name: {image.name} </h3>
+            <div key={image._id} className="imageSpot">
+                <img src={`/image?image=${image.name}`} alt="img" className="imgIcon" onClick={() => visitImage(image.name)} />
+                <h3 className="nameText">Name: {image.name} </h3>
+                <label htmlFor="urlbox">Hosted URL:</label>
+                <input id={`U${image._id}`} type="text" name="urlbox" className="urlText" value={`${window.location.origin}/image?image=${image.name}`} readOnly />
+                <button id={`C${image._id}`} onClick={() => copyUrl(`U${image._id}`, `C${image._id}`)}>Copy URL!</button>
+                <form id={`R${image._id}`}
+                    onSubmit={(e) => { removeImage(e, `R${image._id}`, props.csrf) }}
+                    name={`R${image._id}`}
+                    action="/remove"
+                    method="post"
+                    >
+                <input type="hidden" name="_id" value={image._id} />
+                <input type="hidden" name="_csrf" value={props.csrf} />
+                <input className="imageSubmit" type="submit" value="Remove" />
+            </form>
             </div>
         );
     });
 
     return (
-        <div className="domoList">
+        <div className="imgList">
             {imageNodes}
         </div>
     );
@@ -151,53 +206,63 @@ const ImageList = function(props) {
 const createUpdateWindow = (csrf) => {
     ReactDOM.render(
         <UpdateWindow csrf={csrf} />,
-        document.querySelector("#domos")
+        document.querySelector("#imgDisplay")
     );
     ReactDOM.render(
         <EmptySpace />,
-        document.querySelector("#makeDomo")
+        document.querySelector("#uploader")
     );
 };
 
-const loadImagesFromServer = () => {
+const loadImagesFromServer = (csrf) => {
     sendAjax('GET', '/getImages', null, (data) => {
         ReactDOM.render(
-            <ImageList images={data.images} />, document.querySelector("#domos")
+            <ImageList images={data.images} csrf={csrf} />, document.querySelector("#imgDisplay")
         );
     });
 };
 
 const createDisplayWindow = (csrf) => {
     ReactDOM.render(
-        <ImgForm csrf={csrf} />, document.querySelector("#makeDomo")
+        <ImgForm csrf={csrf} />, document.querySelector("#uploader")
     );
 
     ReactDOM.render(
-        <ImageList images={[]} />, document.querySelector("#domos")
+        <ImageList images={[]} csrf={csrf} />, document.querySelector("#imgDisplay")
     );
 
-    loadImagesFromServer();
+    loadImagesFromServer(csrf);
 };
 
 const createUpgradeWindow = (csrf) => {
     ReactDOM.render(
-        <PremiumForm csrf={csrf} />, document.querySelector("#domos")
+        <PremiumForm csrf={csrf} />, document.querySelector("#imgDisplay")
     );
     ReactDOM.render(
         <EmptySpace />,
-        document.querySelector("#makeDomo")
+        document.querySelector("#uploader")
     );
 };
 
 const handleAds = () => {
-    ReactDOM.render(
-        <Advertisement/>, document.querySelector("#ads")
-    );
+    sendAjax('GET', '/user', null, (data) => {
+        ReactDOM.render(
+            <Advertisement isPremium={data.isPremium} />, document.querySelector("#ads")
+        );
+    });
 };
+
+const updateSlots = () => {
+    sendAjax('GET', '/user', null, (data) => {
+        ReactDOM.render(
+            <SlotStatus slots={data.slots} />, document.querySelector("#slots")
+        );
+    });
+}
 
 const setup = function(csrf) {
     const updateButton = document.querySelector("#updateButton");
-    const displayButton = document.querySelector("#domoButton");
+    const displayButton = document.querySelector("#imgButton");
     const upgradeButton = document.querySelector("#upgradeButton");
 
     updateButton.addEventListener("click", (e) => {
@@ -219,6 +284,7 @@ const setup = function(csrf) {
     });
 
     createDisplayWindow(csrf);
+    updateSlots();
     handleAds();
 };
 

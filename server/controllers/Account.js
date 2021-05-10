@@ -3,16 +3,18 @@ const { AccountModel } = require('../models/Account');
 
 const { Account } = models;
 
+// render login page
 const loginPage = (req, res) => {
-  // console.log(req.csrfToken());
   res.render('login', { csrfToken: req.csrfToken() });
 };
 
+// log the current user out
 const logout = (req, res) => {
   req.session.destroy();
   res.redirect('/');
 };
 
+// user log in
 const login = (request, response) => {
   const req = request;
   const res = response;
@@ -36,7 +38,7 @@ const login = (request, response) => {
 };
 
 // method for updating mongoDB with account info
-const updateDB = (res, req, account) => {
+const updateDB = (req, res, account) => {
   const savePromise = account.save();
   savePromise.then(() => {
     req.session.account = Account.AccountModel.toAPI(account);
@@ -58,7 +60,6 @@ const signup = (request, response) => {
   const req = request;
   const res = response;
 
-  // cast to string
   req.body.username = `${req.body.username}`;
   req.body.pass = `${req.body.pass}`;
   req.body.pass2 = `${req.body.pass2}`;
@@ -112,7 +113,7 @@ const updatePass = (request, response) => {
       user.salt = salt;
       user.password = hash;
 
-      return updateDB(res, req, user);
+      return updateDB(req, res, user);
     });
   });
 };
@@ -136,10 +137,32 @@ const upgradeAccount = (request, response) => {
     user.slots += 5;
     user.premium = true;
 
-    return updateDB(res, req, user);
+    return updateDB(req, res, user);
   });
 };
 
+// returns non-sensitive account info of the current user for displays
+const getAccountInfo = (request, response) => {
+  const req = request;
+  const res = response;
+
+  return Account.AccountModel.findByUsername(req.session.account.username, (err, doc) => {
+    if (err) {
+      return res.status(400).json({ error: 'Account not found' });
+    }
+
+    const account = {
+      username: doc.username,
+      slots: doc.slots,
+      isPremium: doc.premium,
+      created: doc.createdDate,
+    };
+
+    return res.status(200).json(account);
+  });
+};
+
+// gets the csrf token
 const getToken = (request, response) => {
   const req = request;
   const res = response;
@@ -159,4 +182,5 @@ module.exports = {
   getToken,
   updatePass,
   upgradeAccount,
+  getAccountInfo,
 };

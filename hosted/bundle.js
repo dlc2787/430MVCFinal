@@ -1,19 +1,20 @@
 "use strict";
 
-var handleUpload = function handleUpload(e) {
+var handleUpload = function handleUpload(e, csrf) {
   e.preventDefault();
-  $("#domoMessage").animate({
+  $("#serverMessage").animate({
     width: 'hide'
   }, 350);
 
-  if (!$("#domoName").val()) {
+  if (!$("#imgName").val()) {
     handleError("Please add an image to host!");
     return false;
   }
 
   var data = new FormData($("#imgForm")[0]);
   sendImageAjax('post', $("#imgForm").attr("action"), data, function () {
-    loadImagesFromServer();
+    loadImagesFromServer(csrf);
+    updateSlots();
   });
   return false;
 }; //password update
@@ -21,7 +22,7 @@ var handleUpload = function handleUpload(e) {
 
 var handleUpdate = function handleUpdate(e) {
   e.preventDefault();
-  $("#domoMessage").animate({
+  $("#serverMessage").animate({
     width: 'hide'
   }, 350);
 
@@ -41,7 +42,7 @@ var handleUpdate = function handleUpdate(e) {
 
 var handleUpgrade = function handleUpgrade(e) {
   e.preventDefault();
-  $("#domoMessage").animate({
+  $("#serverMessage").animate({
     width: 'hide'
   }, 350);
   sendAjax('POST', $("#preForm").attr("action"), $("#preForm").serialize(), redirect);
@@ -50,6 +51,24 @@ var handleUpgrade = function handleUpgrade(e) {
 
 var visitImage = function visitImage(name) {
   window.location = "/image?image=".concat(name);
+};
+
+var removeImage = function removeImage(e, formId, csrf) {
+  e.preventDefault();
+  $("#serverMessage").animate({
+    width: 'hide'
+  }, 350);
+  sendAjax('POST', $("#".concat(formId)).attr("action"), $("#".concat(formId)).serialize(), function () {
+    loadImagesFromServer(csrf);
+    updateSlots();
+  });
+};
+
+var copyUrl = function copyUrl(imgname, callbutton) {
+  var copyurl = $("#".concat(imgname));
+  copyurl.select();
+  document.execCommand("copy");
+  ReactDOM.render("Copied!", document.querySelector("#".concat(callbutton)));
 };
 
 var UpdateWindow = function UpdateWindow(props) {
@@ -95,16 +114,18 @@ var UpdateWindow = function UpdateWindow(props) {
 var ImgForm = function ImgForm(props) {
   return /*#__PURE__*/React.createElement("form", {
     id: "imgForm",
-    onSubmit: handleUpload,
+    onSubmit: function onSubmit(e) {
+      return handleUpload(e, props.csrf);
+    },
     name: "imgForm",
     action: "/upload",
     method: "post",
     encType: "multipart/form-data",
-    className: "domoForm"
+    className: "imageForm"
   }, /*#__PURE__*/React.createElement("label", {
     htmlFor: "pic"
   }, "Image to Host: "), /*#__PURE__*/React.createElement("input", {
-    id: "domoName",
+    id: "imgName",
     accept: "image/*",
     type: "file",
     name: "pic"
@@ -113,7 +134,7 @@ var ImgForm = function ImgForm(props) {
     name: "_csrf",
     value: props.csrf
   }), /*#__PURE__*/React.createElement("input", {
-    className: "nameDomoSubmit",
+    className: "imageSubmit",
     type: "submit",
     value: "Upload"
   }));
@@ -126,25 +147,36 @@ var PremiumForm = function PremiumForm(props) {
     name: "preForm",
     action: "/upgrade",
     method: "post",
-    className: "domoForm"
+    className: "imageForm"
   }, /*#__PURE__*/React.createElement("input", {
     type: "hidden",
     name: "_csrf",
     value: props.csrf
   }), /*#__PURE__*/React.createElement("input", {
-    className: "nameDomoSubmit",
+    className: "imageSubmit",
     type: "submit",
     value: "Upgrade!"
   })));
 };
 
-var Advertisement = function Advertisement() {
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("a", {
-    href: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-  }, /*#__PURE__*/React.createElement("img", {
-    src: "/assets/img/ad.png",
-    alt: "a wonderful advertisement :)"
-  })));
+var SlotStatus = function SlotStatus(props) {
+  return /*#__PURE__*/React.createElement("span", null, "Slots Remaining: ", props.slots);
+};
+
+var Advertisement = function Advertisement(props) {
+  if (!props.isPremium) {
+    return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("a", {
+      href: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    }, /*#__PURE__*/React.createElement("img", {
+      src: "/assets/img/ad.png",
+      alt: "a wonderful advertisement :)"
+    })));
+  } else {
+    return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("img", {
+      src: "/assets/img/premium.png",
+      alt: "Thank you!"
+    }));
+  }
 };
 
 var EmptySpace = function EmptySpace() {
@@ -154,72 +186,121 @@ var EmptySpace = function EmptySpace() {
 var ImageList = function ImageList(props) {
   if (props.images.length === 0) {
     return /*#__PURE__*/React.createElement("div", {
-      className: "domoList"
+      className: "imgList"
     }, /*#__PURE__*/React.createElement("h3", {
-      className: "emptyDomo"
-    }, " No Images yet"));
+      className: "emptyBlock"
+    }, " Use the form at the top of the page to host your first image!"));
   }
 
-  ;
+  ; //big block for image display
+
   var imageNodes = props.images.map(function (image) {
     return /*#__PURE__*/React.createElement("div", {
       key: image._id,
-      className: "domo",
+      className: "imageSpot"
+    }, /*#__PURE__*/React.createElement("img", {
+      src: "/image?image=".concat(image.name),
+      alt: "img",
+      className: "imgIcon",
       onClick: function onClick() {
         return visitImage(image.name);
       }
-    }, /*#__PURE__*/React.createElement("img", {
-      src: "/assets/img/domoface.jpeg",
-      alt: "img",
-      className: "domoFace"
     }), /*#__PURE__*/React.createElement("h3", {
-      className: "domoName"
-    }, "Name: ", image.name, " "));
+      className: "nameText"
+    }, "Name: ", image.name, " "), /*#__PURE__*/React.createElement("label", {
+      htmlFor: "urlbox"
+    }, "Hosted URL:"), /*#__PURE__*/React.createElement("input", {
+      id: "U".concat(image._id),
+      type: "text",
+      name: "urlbox",
+      className: "urlText",
+      value: "".concat(window.location.origin, "/image?image=").concat(image.name),
+      readOnly: true
+    }), /*#__PURE__*/React.createElement("button", {
+      id: "C".concat(image._id),
+      onClick: function onClick() {
+        return copyUrl("U".concat(image._id), "C".concat(image._id));
+      }
+    }, "Copy URL!"), /*#__PURE__*/React.createElement("form", {
+      id: "R".concat(image._id),
+      onSubmit: function onSubmit(e) {
+        removeImage(e, "R".concat(image._id), props.csrf);
+      },
+      name: "R".concat(image._id),
+      action: "/remove",
+      method: "post"
+    }, /*#__PURE__*/React.createElement("input", {
+      type: "hidden",
+      name: "_id",
+      value: image._id
+    }), /*#__PURE__*/React.createElement("input", {
+      type: "hidden",
+      name: "_csrf",
+      value: props.csrf
+    }), /*#__PURE__*/React.createElement("input", {
+      className: "imageSubmit",
+      type: "submit",
+      value: "Remove"
+    })));
   });
   return /*#__PURE__*/React.createElement("div", {
-    className: "domoList"
+    className: "imgList"
   }, imageNodes);
 };
 
 var createUpdateWindow = function createUpdateWindow(csrf) {
   ReactDOM.render( /*#__PURE__*/React.createElement(UpdateWindow, {
     csrf: csrf
-  }), document.querySelector("#domos"));
-  ReactDOM.render( /*#__PURE__*/React.createElement(EmptySpace, null), document.querySelector("#makeDomo"));
+  }), document.querySelector("#imgDisplay"));
+  ReactDOM.render( /*#__PURE__*/React.createElement(EmptySpace, null), document.querySelector("#uploader"));
 };
 
-var loadImagesFromServer = function loadImagesFromServer() {
+var loadImagesFromServer = function loadImagesFromServer(csrf) {
   sendAjax('GET', '/getImages', null, function (data) {
     ReactDOM.render( /*#__PURE__*/React.createElement(ImageList, {
-      images: data.images
-    }), document.querySelector("#domos"));
+      images: data.images,
+      csrf: csrf
+    }), document.querySelector("#imgDisplay"));
   });
 };
 
 var createDisplayWindow = function createDisplayWindow(csrf) {
   ReactDOM.render( /*#__PURE__*/React.createElement(ImgForm, {
     csrf: csrf
-  }), document.querySelector("#makeDomo"));
+  }), document.querySelector("#uploader"));
   ReactDOM.render( /*#__PURE__*/React.createElement(ImageList, {
-    images: []
-  }), document.querySelector("#domos"));
-  loadImagesFromServer();
+    images: [],
+    csrf: csrf
+  }), document.querySelector("#imgDisplay"));
+  loadImagesFromServer(csrf);
 };
 
 var createUpgradeWindow = function createUpgradeWindow(csrf) {
   ReactDOM.render( /*#__PURE__*/React.createElement(PremiumForm, {
     csrf: csrf
-  }), document.querySelector("#domos"));
-  ReactDOM.render( /*#__PURE__*/React.createElement(EmptySpace, null), document.querySelector("#makeDomo"));
+  }), document.querySelector("#imgDisplay"));
+  ReactDOM.render( /*#__PURE__*/React.createElement(EmptySpace, null), document.querySelector("#uploader"));
 };
 
 var handleAds = function handleAds() {
-  ReactDOM.render( /*#__PURE__*/React.createElement(Advertisement, null), document.querySelector("#ads"));
+  sendAjax('GET', '/user', null, function (data) {
+    ReactDOM.render( /*#__PURE__*/React.createElement(Advertisement, {
+      isPremium: data.isPremium
+    }), document.querySelector("#ads"));
+  });
+};
+
+var updateSlots = function updateSlots() {
+  sendAjax('GET', '/user', null, function (data) {
+    ReactDOM.render( /*#__PURE__*/React.createElement(SlotStatus, {
+      slots: data.slots
+    }), document.querySelector("#slots"));
+  });
 };
 
 var setup = function setup(csrf) {
   var updateButton = document.querySelector("#updateButton");
-  var displayButton = document.querySelector("#domoButton");
+  var displayButton = document.querySelector("#imgButton");
   var upgradeButton = document.querySelector("#upgradeButton");
   updateButton.addEventListener("click", function (e) {
     e.preventDefault();
@@ -237,6 +318,7 @@ var setup = function setup(csrf) {
     return false;
   });
   createDisplayWindow(csrf);
+  updateSlots();
   handleAds();
 };
 
@@ -254,14 +336,14 @@ $(document).ready(function () {
 //handle error
 var handleError = function handleError(message) {
   $("#errorMessage").text(message);
-  $("#domoMessage").animate({
+  $("#serverMessage").animate({
     width: 'toggle'
   }, 350);
 }; //redirect
 
 
 var redirect = function redirect(response) {
-  $("#domoMessage").animate({
+  $("#serverMessage").animate({
     width: 'hide'
   }, 350);
   window.location = response.redirect;

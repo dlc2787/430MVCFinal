@@ -3,7 +3,7 @@
 //login
 var handleLogin = function handleLogin(e) {
   e.preventDefault();
-  $("#domoMessage").animate({
+  $("#serverMessage").animate({
     width: 'hide'
   }, 350);
 
@@ -20,7 +20,7 @@ var handleLogin = function handleLogin(e) {
 
 var handleSignup = function handleSignup(e) {
   e.preventDefault();
-  $("#domoMessage").animate({
+  $("#serverMessage").animate({
     width: 'hide'
   }, 350);
 
@@ -153,14 +153,14 @@ $(document).ready(function () {
 //handle error
 var handleError = function handleError(message) {
   $("#errorMessage").text(message);
-  $("#domoMessage").animate({
+  $("#serverMessage").animate({
     width: 'toggle'
   }, 350);
 }; //redirect
 
 
 var redirect = function redirect(response) {
-  $("#domoMessage").animate({
+  $("#serverMessage").animate({
     width: 'hide'
   }, 350);
   window.location = response.redirect;

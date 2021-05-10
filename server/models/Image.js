@@ -51,7 +51,7 @@ const ImageSchema = new mongoose.Schema({
 
 ImageSchema.statics.toAPI = (doc) => ({
   name: doc.name,
-  data: doc.data,
+  _id: doc._id,
   mimetype: doc.mimetype,
 });
 
@@ -60,6 +60,13 @@ ImageSchema.statics.findByOwner = (ownerId, callback) => {
     owner: convertId(ownerId),
   };
   return ImageModel.find(search).select('name data mimetype').lean().exec(callback);
+};
+
+ImageSchema.statics.removeImage = (imageId, callback) => {
+  const toDelete = {
+    _id: imageId,
+  };
+  return ImageModel.deleteOne(toDelete).exec(callback);
 };
 
 ImageModel = mongoose.model('ImageModel', ImageSchema);

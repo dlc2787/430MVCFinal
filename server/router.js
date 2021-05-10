@@ -14,6 +14,8 @@ const router = (app) => {
   app.post('/upload', mid.requiresLogin, mid.requiresSecure, mid.validateSpace, controllers.Image.uploadImage);
   app.post('/upgrade', mid.requiresLogin, mid.requiresSecure, controllers.Account.upgradeAccount);
   app.get('/image', mid.requiresLogin, controllers.Image.getImageByName);
+  app.post('/remove', mid.requiresLogin, mid.requiresSecure, controllers.Image.removeImage);
+  app.get('/user', mid.requiresLogin, mid.requiresSecure, controllers.Account.getAccountInfo);
 };
 
 module.exports = router;
