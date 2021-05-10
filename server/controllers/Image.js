@@ -3,6 +3,7 @@ const models = require('../models');
 const { Image } = models;
 const { Account } = models;
 
+//display the uploads page where users can upload and view images
 const uploadsPage = (req, res) => {
   Image.ImageModel.findByOwner(req.session.account._id, (err, docs) => {
     if (err) {
@@ -13,6 +14,7 @@ const uploadsPage = (req, res) => {
   });
 };
 
+//retrieve images from the database
 const getImages = (request, response) => {
   const req = request;
   const res = response;
@@ -96,6 +98,7 @@ const removeImage = (request, response) => {
   });
 };
 
+//retrieves a single image by name and sends it to the user
 const getImageByName = (request, response) => {
   const req = request;
   const res = response;

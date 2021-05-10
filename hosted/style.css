@@ -4,6 +4,12 @@ html, body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    background-color: #F8FFF6;
+}
+
+#topbar{
+    position: absolute;
+    width: 100%;
 }
 
 #logo {
@@ -17,7 +23,8 @@ html, body {
 nav {
     width: 100%;
     height: 50px;
-    background-color: #55acee;
+    background-color: #48BC3C;
+    z-index: 1;
 }
 
 nav:nth-child(1) {
@@ -38,64 +45,78 @@ nav:nth-child(1) {
     text-decoration: none;
     padding: 5px;
     border-radius: 4px;
-    background-color: #55acee;
+    background-color: #48BC3C;
     transition: background-color 0.4s ease;
 }
 
 .navlink a:hover {
     transition: background-color 0.8s ease;
-    background-color: #66bdff;
+    background-color: #54DA46;
+}
+
+#uploader {
+    display: flex;
+    justify-content: center;
 }
 
 .imageForm {
-    border: 2px solid #338acc;
     height: 35px;
-    width: 900px;
-    margin-top:0px;
+    margin-top:-4px;
     padding-top:10px;
-    background-color: #55acee;
-    border-bottom-right-radius: 4px;
-    border-top-right-radius: 4px;
+    background-color: #A1F498;
+    border-radius: 4px;
+    z-index: 0;
+    padding-right: 0.4rem;
 }
 
 .imageForm label {
     display: inline-block;
-    width: 75px;
-    margin-left: 10px;
+    margin: 0px 0.4rem;
     font-size: 1.2em;
     float: left;
-    color: white;
+    color: black;
 }
 
 .imageForm input[type=text] {
     float:left;
 }
 
-.imageSubmit {
+.imageSubmit, .removeSubmit, .cpyBtn{
     transition: background-color 0.4s ease;
     display: inline;
     width: 90px;
     background-color: #55acee;
-    border-radius: 2px;
+    border-radius: 4px;
     color: white;
     text-decoration: none;
+    cursor: pointer;
+}
+
+.cpyBtn{
+    margin-top: 0.4rem;
+    float: right;
+}
+
+.removeSubmit {
+    float: right;
 }
 
 .imageSubmit:link, .imageSubmit:visited, .imageSubmit:hover, .imageSubmit:active {
     color: white;
 }
 
-.imageSubmit:hover {
+.imageSubmit:hover, .removeSubmit:hover, .cpyBtn:hover {
     transition: background-color 0.4s ease;
     background-color: #338acc;
 }
 
-.mainForm {
+.mainForm, .notice {
     height: 300px;
-    width: 350px;
+    width: 400px;
     margin: 0 auto;
-    padding-top: 350px;
+    padding-top: 200px;
     font-size: 1.2em;
+    text-align: center;
 }
 
 .mainForm h3 {
@@ -104,7 +125,6 @@ nav:nth-child(1) {
 
 .mainForm label {
     display: inline-block;
-    width: 100px;
     margin-right: 10px;
     text-align: right;
     font-size: 1.2em;
@@ -117,13 +137,13 @@ nav:nth-child(1) {
     margin: 0 auto;
     margin-top: 14px;
     font-size: 1.2em;
-    width: 100px;
-    background-color: #55acee;
-    border-radius: 2px;
-    border-color: #66acee;
+    background-color: #48BC3C;
+    border-radius: 4px;
+    border-color: #3fad32;
     padding: 3px 0px;
     color: white;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .formSubmit:link, .formSubmit:visited, .formSubmit:hover, .formSubmit:active {
@@ -132,17 +152,17 @@ nav:nth-child(1) {
 
 .formSubmit:hover {
     transition: background-color 0.4s ease;
-    background-color: #338acc;
+    background-color: #54DA46;
 }
 
-#user, #pass, #pass2 {
+#user, #pass, #pass2, #newPass, #newPass2{
     text-align: center;
     font-size: 1.1em;
     width: 180px;
     border-radius: 6px;
 }
 
-#user:focus, #pass:focus, #pass2:focus {
+#user:focus, #pass:focus, #pass2:focus, #newPass:focus, #newPass2:focus, .urlText:focus{
     outline: none;
     box-shadow: 0px 0px 1px 1px #55acee;
 }
@@ -190,9 +210,7 @@ nav:nth-child(1) {
 
 #imgDisplay {
     width: 40%;
-    min-width: 400px;
-    border: 2px solid #55acee;
-    border-radius: 4px;
+    min-width: 600px;
     margin: 0 auto;
     margin-top: 100px;
 }
@@ -204,24 +222,30 @@ nav:nth-child(1) {
     margin-bottom: 2px;
     border: 2px solid #55acee;
     border-radius: 4px;
-    background-color: #55acee;
+    background-color: #C9CBCD;
     padding: 10px;
     min-height:60px;
     overflow: hidden;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    min-height: 50px;
 }
 
 .imageSpot:hover {
     transition: border-color 0.2s ease-out;
     border-color: rgba(255,255,255, 0.8);
     transition: background-color 2.6s ease-out;
-    background-color: #66bfff;
+    background-color: #C2C9D0;
 }
 
 img.imgIcon {
     margin-left: 25px;
     margin-right: 10px;
-    height: 50px;
-    width: 50px;
+    height: 200px;
+    width: 200px;
     border-radius: 4px;
     margin-top:10px;
     float:left;
@@ -236,21 +260,21 @@ h3.emptyBlock {
     margin-top: 18px;
 }
 
-h3.nameText {
+.nameText {
     float:left;
-    width: 200px;
     font-weight: bold;
-    padding-left: 65px;
+    padding-left: 5px;
     font-size: 1.5em;
 }
 
-h3.urlText {
-    float:right;
+.urlText {
     text-align: left;
-    width: 100px;
-    font-weight: bold;
-    padding-right: 40px;
-    font-size: 1.5em;
+    border-radius: 6px;
+    font-size: 1.1em;
+}
+
+.removeForm {
+    margin-top: 50px;
 }
 
 .imageSpot:first-child {
@@ -262,15 +286,18 @@ h3.urlText {
 }
 
 #ads {
-    position:absolute;
+    position: absolute;
     top: 5rem;
     right: 2rem;
     padding: 0.4rem;
-    border: 2px solid #338acc;
-    border-radius: 10px;
     width: 20rem;
     height: 40rem;
     text-align: center;
+}
+
+#slots {
+    float: right;
+    margin-right: 3rem;
 }
 
 #ads img{

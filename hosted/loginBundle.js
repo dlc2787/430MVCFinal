@@ -36,7 +36,8 @@ var handleSignup = function handleSignup(e) {
 
   sendAjax('POST', $("#signupForm").attr("action"), $("#signupForm").serialize(), redirect);
   return false;
-};
+}; //JSX login window
+
 
 var LogInWindow = function LogInWindow(props) {
   return /*#__PURE__*/React.createElement("form", {
@@ -53,7 +54,7 @@ var LogInWindow = function LogInWindow(props) {
     type: "text",
     name: "username",
     placeholder: "username"
-  }), /*#__PURE__*/React.createElement("label", {
+  }), /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("label", {
     htmlFor: "pass"
   }, "Password: "), /*#__PURE__*/React.createElement("input", {
     id: "pass",
@@ -69,7 +70,8 @@ var LogInWindow = function LogInWindow(props) {
     type: "submit",
     value: "Sign In"
   }));
-};
+}; //JSX sign up window
+
 
 var SignupWindow = function SignupWindow(props) {
   return /*#__PURE__*/React.createElement("form", {
@@ -86,14 +88,14 @@ var SignupWindow = function SignupWindow(props) {
     type: "text",
     name: "username",
     placeholder: "username"
-  }), /*#__PURE__*/React.createElement("label", {
+  }), /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("label", {
     htmlFor: "pass"
   }, "Password: "), /*#__PURE__*/React.createElement("input", {
     id: "pass",
     type: "password",
     name: "pass",
     placeholder: "password"
-  }), /*#__PURE__*/React.createElement("label", {
+  }), /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("label", {
     htmlFor: "pass2"
   }, "Password: "), /*#__PURE__*/React.createElement("input", {
     id: "pass2",
@@ -109,19 +111,22 @@ var SignupWindow = function SignupWindow(props) {
     type: "submit",
     value: "Sign up"
   }));
-};
+}; //render login window
+
 
 var createLoginWindow = function createLoginWindow(csrf) {
   ReactDOM.render( /*#__PURE__*/React.createElement(LogInWindow, {
     csrf: csrf
   }), document.querySelector("#content"));
-};
+}; //render sign up window
+
 
 var createSignupWindow = function createSignupWindow(csrf) {
   ReactDOM.render( /*#__PURE__*/React.createElement(SignupWindow, {
     csrf: csrf
   }), document.querySelector("#content"));
-};
+}; //setup login pages
+
 
 var setup = function setup(csrf) {
   var loginButton = document.querySelector("#loginButton");
@@ -137,7 +142,8 @@ var setup = function setup(csrf) {
     return false;
   });
   createLoginWindow(csrf);
-};
+}; //get csrf token
+
 
 var getToken = function getToken() {
   sendAjax('GET', '/getToken', null, function (result) {
@@ -164,7 +170,7 @@ var redirect = function redirect(response) {
     width: 'hide'
   }, 350);
   window.location = response.redirect;
-}; //send ajax
+}; //send ajax request
 
 
 var sendAjax = function sendAjax(type, action, data, success) {
@@ -180,7 +186,8 @@ var sendAjax = function sendAjax(type, action, data, success) {
       handleError(messageObj.error);
     }
   });
-};
+}; //ajax request for submitting images
+
 
 var sendImageAjax = function sendImageAjax(type, action, data, success) {
   $.ajax({

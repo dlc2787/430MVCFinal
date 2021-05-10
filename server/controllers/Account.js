@@ -3,6 +3,11 @@ const { AccountModel } = require('../models/Account');
 
 const { Account } = models;
 
+//404 not found
+const handleNotFound = (req, res) => {
+  res.redirect('/');
+};
+
 // render login page
 const loginPage = (req, res) => {
   res.render('login', { csrfToken: req.csrfToken() });
@@ -162,7 +167,7 @@ const getAccountInfo = (request, response) => {
   });
 };
 
-// gets the csrf token
+// returns the csrf token
 const getToken = (request, response) => {
   const req = request;
   const res = response;
@@ -183,4 +188,5 @@ module.exports = {
   updatePass,
   upgradeAccount,
   getAccountInfo,
+  handleNotFound,
 };

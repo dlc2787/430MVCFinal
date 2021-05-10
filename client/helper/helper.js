@@ -10,7 +10,7 @@ const redirect = (response) => {
     window.location = response.redirect;
 };
 
-//send ajax
+//send ajax request
 const sendAjax = (type, action, data, success) => {
     $.ajax({
         cache: false,
@@ -26,7 +26,7 @@ const sendAjax = (type, action, data, success) => {
     });
 };
 
-
+//ajax request for submitting images
 const sendImageAjax = (type, action, data, success) => {
     $.ajax({
         cache: false,

@@ -1,3 +1,4 @@
+//upload an imange
 const handleUpload = (e, csrf) => {
     e.preventDefault();
 
@@ -39,6 +40,7 @@ const handleUpdate = (e) => {
     return false;
 }
 
+//upgrade to premium account
 const handleUpgrade = (e) => {
     e.preventDefault();
 
@@ -49,10 +51,12 @@ const handleUpgrade = (e) => {
     return false
 }
 
+//go the the images hosted URL
 const visitImage = (name) => {
     window.location = `/image?image=${name}`;
 }
 
+//remove a hosted image from a user's account/ the database
 const removeImage = (e, formId, csrf) => {
     e.preventDefault();
 
@@ -64,6 +68,7 @@ const removeImage = (e, formId, csrf) => {
     });
 }
 
+//copy an hosted url to clipboard
 const copyUrl = (imgname, callbutton) => {
     const copyurl = $(`#${imgname}`);
     copyurl.select();
@@ -74,6 +79,7 @@ const copyUrl = (imgname, callbutton) => {
     );
 }
 
+//JSX form to allow password updates
 const UpdateWindow = (props) => {
     return (
     <form   id="updateForm"
@@ -83,18 +89,20 @@ const UpdateWindow = (props) => {
             method="POST"
             className="mainForm"
     >
+        <h2>Change your password</h2>
     <label htmlFor="oldPass">Password: </label>
     <input id="pass" type ="password" name="pass" placeholder="old password"/>
     <label htmlFor="newPass">New Password: </label>
     <input id="newPass" type ="password" name="newPass" placeholder="new password"/>
     <label htmlFor="newPass2">New Password: </label>
-    <input id="newPass2" type ="password" name="newPass2" placeholder="retype new password"/>
+    <input id="newPass2" type ="password" name="newPass2" placeholder="retype password"/>
     <input type="hidden" name="_csrf" value={props.csrf} />
-    <input className="formSubmit" type="submit" value="Sign up" />
+    <input className="formSubmit" type="submit" value="Change Password" />
     </form>
     );
 };
 
+//JSX form to submit images
 const ImgForm = (props) => {
     return (
         <form id="imgForm"
@@ -113,24 +121,29 @@ const ImgForm = (props) => {
     );
 };
 
+//JSX form to upgrade to premium
 const PremiumForm = (props) => {
+    if (!props.isPremium){
     return (
-        <div>
-        <h2>Upgrade to Premium Account</h2>
         <form id="preForm"
             onSubmit={handleUpgrade}
             name="preForm"
             action="/upgrade"
             method="post"
-            className="imageForm"
+            className="mainForm"
             >
+                <h2>Upgrade to a Premium Account</h2>
                 <input type="hidden" name="_csrf" value={props.csrf} />
-                <input className="imageSubmit" type="submit" value="Upgrade!" />
+                <input className="formSubmit" type="submit" value="Upgrade!" />
             </form>
-        </div>
     );
+}
+else {
+    return (<h2 className="notice">Your account is already premium!</h2>);
+}
 };
 
+//display how many image slots a user has left
 const SlotStatus = (props) => {
     return (
         <span>
@@ -139,6 +152,7 @@ const SlotStatus = (props) => {
     );
 };
 
+//JSX advertisement
 const Advertisement = (props) => {
     if (!props.isPremium)
     {
@@ -160,10 +174,12 @@ const Advertisement = (props) => {
     }
 };
 
+//when something previously filled needs to not be shown
 const EmptySpace = () => {
     return (<div></div>);
 }
 
+//display the images a user has uploaded
 const ImageList = function(props) {
     if (props.images.length === 0) {
         return (
@@ -174,15 +190,20 @@ const ImageList = function(props) {
     };
 
     //big block for image display
+    //throws in a preview of each image, name, and puts the url in a textbox so users can copy it
+    //also provides a mini-form to allow the user to remove images
+    //image preview is linked to the image's hosted URL
     const imageNodes = props.images.map(function(image) {
         return (
             <div key={image._id} className="imageSpot">
                 <img src={`/image?image=${image.name}`} alt="img" className="imgIcon" onClick={() => visitImage(image.name)} />
+                <div className="info">
                 <h3 className="nameText">Name: {image.name} </h3>
                 <label htmlFor="urlbox">Hosted URL:</label>
                 <input id={`U${image._id}`} type="text" name="urlbox" className="urlText" value={`${window.location.origin}/image?image=${image.name}`} readOnly />
-                <button id={`C${image._id}`} onClick={() => copyUrl(`U${image._id}`, `C${image._id}`)}>Copy URL!</button>
+                <button id={`C${image._id}`} className="cpyBtn" onClick={() => copyUrl(`U${image._id}`, `C${image._id}`)}>Copy URL!</button>
                 <form id={`R${image._id}`}
+                    className="removeForm"
                     onSubmit={(e) => { removeImage(e, `R${image._id}`, props.csrf) }}
                     name={`R${image._id}`}
                     action="/remove"
@@ -190,8 +211,9 @@ const ImageList = function(props) {
                     >
                 <input type="hidden" name="_id" value={image._id} />
                 <input type="hidden" name="_csrf" value={props.csrf} />
-                <input className="imageSubmit" type="submit" value="Remove" />
-            </form>
+                <input className="removeSubmit" type="submit" value="Remove" />
+                </form>
+                </div>
             </div>
         );
     });
@@ -203,17 +225,19 @@ const ImageList = function(props) {
     );
 };
 
+//render password update window
 const createUpdateWindow = (csrf) => {
-    ReactDOM.render(
-        <UpdateWindow csrf={csrf} />,
-        document.querySelector("#imgDisplay")
-    );
-    ReactDOM.render(
-        <EmptySpace />,
-        document.querySelector("#uploader")
-    );
+        ReactDOM.render(
+            <UpdateWindow csrf={csrf} />,
+            document.querySelector("#imgDisplay")
+        );
+        ReactDOM.render(
+            <EmptySpace />,
+            document.querySelector("#uploader")
+        );
 };
 
+//grabs a user's images for display
 const loadImagesFromServer = (csrf) => {
     sendAjax('GET', '/getImages', null, (data) => {
         ReactDOM.render(
@@ -222,6 +246,7 @@ const loadImagesFromServer = (csrf) => {
     });
 };
 
+//renders the window where users can see their images and upload new ones
 const createDisplayWindow = (csrf) => {
     ReactDOM.render(
         <ImgForm csrf={csrf} />, document.querySelector("#uploader")
@@ -234,16 +259,20 @@ const createDisplayWindow = (csrf) => {
     loadImagesFromServer(csrf);
 };
 
+//render the window to upgrade your account
 const createUpgradeWindow = (csrf) => {
-    ReactDOM.render(
-        <PremiumForm csrf={csrf} />, document.querySelector("#imgDisplay")
-    );
-    ReactDOM.render(
-        <EmptySpace />,
-        document.querySelector("#uploader")
-    );
+    sendAjax('GET', '/user', null, (data) => {
+        ReactDOM.render(
+            <PremiumForm csrf={csrf} isPremium={data.isPremium} />, document.querySelector("#imgDisplay")
+        );
+        ReactDOM.render(
+            <EmptySpace />,
+            document.querySelector("#uploader")
+        );
+    });
 };
 
+//render ads
 const handleAds = () => {
     sendAjax('GET', '/user', null, (data) => {
         ReactDOM.render(
@@ -252,6 +281,7 @@ const handleAds = () => {
     });
 };
 
+//display to the user the number of slots they currently have for images
 const updateSlots = () => {
     sendAjax('GET', '/user', null, (data) => {
         ReactDOM.render(
@@ -260,6 +290,7 @@ const updateSlots = () => {
     });
 }
 
+//setup hub display
 const setup = function(csrf) {
     const updateButton = document.querySelector("#updateButton");
     const displayButton = document.querySelector("#imgButton");
@@ -288,6 +319,7 @@ const setup = function(csrf) {
     handleAds();
 };
 
+//retriece csrf token
 const getToken = () => {
     sendAjax('GET', '/getToken', null, (result) => {
         setup(result.csrfToken);

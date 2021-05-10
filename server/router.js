@@ -10,12 +10,13 @@ const router = (app) => {
   app.get('/logout', mid.requiresLogin, controllers.Account.logout);
   app.get('/uploads', mid.requiresLogin, controllers.Image.uploadsPage);
   app.post('/updatePass', mid.requiresSecure, mid.requiresLogin, controllers.Account.updatePass);
-  app.get('/', mid.requiresSecure, mid.requiresLogout, controllers.Account.loginPage);
   app.post('/upload', mid.requiresLogin, mid.requiresSecure, mid.validateSpace, controllers.Image.uploadImage);
   app.post('/upgrade', mid.requiresLogin, mid.requiresSecure, controllers.Account.upgradeAccount);
   app.get('/image', mid.requiresLogin, controllers.Image.getImageByName);
   app.post('/remove', mid.requiresLogin, mid.requiresSecure, controllers.Image.removeImage);
   app.get('/user', mid.requiresLogin, mid.requiresSecure, controllers.Account.getAccountInfo);
+  app.get('/', mid.requiresSecure, mid.requiresLogout, controllers.Account.loginPage);
+  app.get('*', controllers.Account.handleNotFound);
 };
 
 module.exports = router;

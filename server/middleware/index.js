@@ -1,3 +1,4 @@
+//require a user is signed in
 const requiresLogin = (req, res, next) => {
   if (!req.session.account) {
     return res.redirect('/');
@@ -5,6 +6,7 @@ const requiresLogin = (req, res, next) => {
   return next();
 };
 
+//require a user is signed out
 const requiresLogout = (req, res, next) => {
   if (req.session.account) {
     return res.redirect('/uploads');
@@ -12,6 +14,7 @@ const requiresLogout = (req, res, next) => {
   return next();
 };
 
+//require HTTPS
 const requiresSecure = (req, res, next) => {
   if (req.headers['x-forwarded-proto'] !== 'https') {
     return res.redirect(`https://${req.hostname}${req.url}`);
@@ -19,6 +22,7 @@ const requiresSecure = (req, res, next) => {
   return next();
 };
 
+//requrie the user has image spaces left
 const validateSpace = (req, res, next) => {
   if (req.session.account.slots <= 0) {
     return res.redirect('/uploads');
@@ -26,6 +30,7 @@ const validateSpace = (req, res, next) => {
   return next();
 };
 
+//non-heroku methods
 const bypassSecure = (req, res, next) => next();
 
 module.exports.requiresLogin = requiresLogin;
