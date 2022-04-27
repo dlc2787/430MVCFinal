@@ -3,7 +3,7 @@ const { AccountModel } = require('../models/Account');
 
 const { Account } = models;
 
-//404 not found
+// 404 not found
 const handleNotFound = (req, res) => {
   res.redirect('/');
 };

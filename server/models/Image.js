@@ -49,14 +49,14 @@ const ImageSchema = new mongoose.Schema({
   },
 });
 
-//formats image info for the api
+// formats image info for the api
 ImageSchema.statics.toAPI = (doc) => ({
   name: doc.name,
   _id: doc._id,
   mimetype: doc.mimetype,
 });
 
-//finds all images by a username
+// finds all images by a username
 ImageSchema.statics.findByOwner = (ownerId, callback) => {
   const search = {
     owner: convertId(ownerId),
@@ -64,7 +64,7 @@ ImageSchema.statics.findByOwner = (ownerId, callback) => {
   return ImageModel.find(search).select('name data mimetype').lean().exec(callback);
 };
 
-//removes an image from the database
+// removes an image from the database
 ImageSchema.statics.removeImage = (imageId, callback) => {
   const toDelete = {
     _id: imageId,

@@ -40,7 +40,7 @@ const AccountSchema = new mongoose.Schema({
   },
 });
 
-//format info for our api
+// format info for our api
 AccountSchema.statics.toAPI = (doc) => ({
   username: doc.username,
   _id: doc._id,
@@ -48,7 +48,7 @@ AccountSchema.statics.toAPI = (doc) => ({
   premium: doc.premium,
 });
 
-//ensures a password is correct
+// ensures a password is correct
 const validatePassword = (doc, password, callback) => {
   const pass = doc.password;
 
@@ -60,7 +60,7 @@ const validatePassword = (doc, password, callback) => {
   });
 };
 
-//finds a user by username
+// finds a user by username
 AccountSchema.statics.findByUsername = (name, callback) => {
   const search = {
     username: name,
@@ -69,14 +69,14 @@ AccountSchema.statics.findByUsername = (name, callback) => {
   return AccountModel.findOne(search, callback);
 };
 
-//generates a hash for a password
+// generates a hash for a password
 AccountSchema.statics.generateHash = (password, callback) => {
   const salt = crypto.randomBytes(saltLength);
 
   crypto.pbkdf2(password, salt, iterations, keyLength, 'RSA-SHA512', (err, hash) => callback(salt, hash.toString('hex')));
 };
 
-//authenticates user who is logging in
+// authenticates user who is logging in
 AccountSchema.statics.authenticate = (username, password, callback) => {
   AccountModel.findByUsername(username, (err, doc) => {
     if (err) {

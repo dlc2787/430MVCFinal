@@ -50,7 +50,7 @@ const redisClient = redis.createClient({
 });
 
 // connect router
-const router = require('./router.js');
+const router = require('./router');
 
 // app setup
 const app = express();
@@ -73,7 +73,8 @@ app.use(session({
     httpOnly: true,
   },
 }));
-app.engine('handlebars', expressHandlebars({ defaultLayout: 'main' }));
+
+app.engine('handlebars', expressHandlebars.create({ defaultLayout: 'main' }).engine);
 app.set('view engine', 'handlebars');
 app.set('views', `${__dirname}/../views`);
 app.disable('x-powered-by');
