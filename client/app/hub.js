@@ -13,7 +13,7 @@ const handleUpload = (e, csrf) => {
 
     sendImageAjax('post', $("#imgForm").attr("action"), data, function() {
         loadImagesFromServer(csrf);
-        $("#imgform")[0].value = "";
+        $("#imgForm")[0].value = "";
         updateSlots();
     });
 
